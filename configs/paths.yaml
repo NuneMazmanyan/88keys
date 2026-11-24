@@ -1,0 +1,16 @@
+# Where datasets live. Override with the env var DATA_ROOT on the GPU machine.
+data_root: data
+raw:
+  maestro: data/raw/maestro-v3.0.0
+  asap: data/raw/asap-dataset
+  maps: data/raw/maps
+  pop909: data/raw/POP909-Dataset
+  chordonomicon: data/raw/chordonomicon
+  noise: data/raw/noise
+  irs: data/raw/irs
+processed:
+  maestro: data/processed/maestro_16k
+  splits: data/processed/splits.json
+
+audio:
+  sample_rate: 16000

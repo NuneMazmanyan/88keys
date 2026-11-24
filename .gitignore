@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Data and outputs (never commit datasets or checkpoints)
+data/*
+!data/README.md
+checkpoints/
+outputs/
+wandb/
+lightning_logs/
+*.ckpt
+*.onnx
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
