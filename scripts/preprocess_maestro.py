@@ -17,6 +17,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import pandas as pd
+import soundfile as sf
 from tqdm import tqdm
 
 from pianoscribe.data.audio import convert_to_canonical
@@ -32,7 +33,7 @@ def process_one(raw_root: str, out_root: str, row: dict) -> dict:
     if not audio_dst.exists():
         duration = convert_to_canonical(raw / row["audio_filename"], audio_dst)
     else:
-        duration = row["duration"]
+        duration = sf.info(str(audio_dst)).duration
     perf = performance_from_midi(raw / row["midi_filename"])
     label_dst.parent.mkdir(parents=True, exist_ok=True)
     perf.save(label_dst)
