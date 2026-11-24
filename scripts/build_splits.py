@@ -47,7 +47,18 @@ def main() -> None:
     else:
         print("POP909 not found, skipped")
 
-    for name in ("noise", "irs"):
+    rirs = args.raw / "rirs_noises" / "RIRS_NOISES"
+    if rirs.exists():
+        from pianoscribe.eval.wild import catalog
+
+        cat = catalog(rirs)
+        result["rirs_noises"] = cat
+        for kind, parts in cat.items():
+            print(f"{kind}:", {k: len(v) for k, v in parts.items()})
+    else:
+        print("RIRS_NOISES not found, skipped")
+
+    for name in ("noise", "irs"):  # optional extra collections (e.g. MUSAN) in Phase 2
         d = args.raw / name
         if d.exists():
             result[name] = S.split_directory(d)

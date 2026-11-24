@@ -9,7 +9,8 @@ Diploma project. Python package name: `pianoscribe`.
 | Score engine | Notes + beats → two-staff MusicXML | Phase 3 |
 | HarmoNet + Arranger | Melody → chords → richer piano arrangement | Phase 4 |
 | API + web app | Upload, view, play, enrich | Phase 5 |
-| **Data pipeline** | Downloads, preprocessing, leakage-safe splits | **Phase 0 (this)** |
+| Data pipeline | Downloads, preprocessing, leakage-safe splits | Phase 0 ✓ |
+| **Evaluation + MAESTRO-Wild** | Metrics, real-world test conditions, benchmark runner | **Phase 1** |
 
 ## Setup (macOS or Linux)
 
@@ -50,6 +51,37 @@ MAPS has to be requested from Télécom Paris and placed in `data/raw/maps`.
 3. ASAP pieces with any performance in MAESTRO test are excluded from beat training.
 4. POP909: seeded song-level 80/10/10.
 5. Noise and room impulse responses: stable hash split 80/20 (train / MAESTRO-Wild test).
+
+## Evaluation and MAESTRO-Wild
+
+MAESTRO-Wild re-records the MAESTRO test pieces under real-world conditions, using real
+room impulse responses and real noises (OpenSLR RIRS_NOISES, test half only):
+
+| Condition | What it simulates |
+|---|---|
+| clean | original audio |
+| reverb_medium / reverb_long | room, RT60 0.3–0.8 s / > 0.8 s |
+| noise_20 / noise_10 / noise_5 | background noise at that SNR (dB) |
+| phone | phone mic band-limit + soft compression + AAC 48 kbps |
+| combined | room + noise 10 dB + phone |
+
+Timing is preserved (reverb aligned to the direct sound, codec delay removed), so the
+original note labels stay exact.
+
+```bash
+uv sync --extra dev --extra reference                    # adds the reference model
+uv run python scripts/download_rirs_noises.py            # ~1.3 GB
+uv run python scripts/build_wild.py --max-seconds 60     # quick version; omit for full pieces
+uv run python scripts/run_benchmark.py --models oracle reference
+```
+
+Results go to `outputs/benchmark/results.csv` (every piece, every metric) and
+`outputs/benchmark/summary.md`. `oracle` returns the ground truth and must score 100;
+it checks the harness itself.
+
+Metrics follow the field's standard (mir_eval): note F1 with 50 ms onset tolerance, note F1
+with offsets, with offsets + velocity, and frame F1. Reference offsets are extended by the
+sustain pedal, as in the MAESTRO papers.
 
 ## Tests
 

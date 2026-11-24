@@ -83,6 +83,15 @@ def performance_from_midi(path: str | Path) -> Performance:
     return Performance(notes=notes, pedal=pedal)
 
 
+def crop(perf: Performance, end_sec: float) -> Performance:
+    """Keep notes that start before `end_sec`; clip offsets and pedal intervals to it."""
+    notes = perf.notes[perf.notes[:, 0] < end_sec].copy()
+    notes[:, 1] = np.minimum(notes[:, 1], end_sec)
+    pedal = perf.pedal[perf.pedal[:, 0] < end_sec].copy()
+    pedal[:, 1] = np.minimum(pedal[:, 1], end_sec)
+    return Performance(notes=notes, pedal=pedal)
+
+
 def extend_offsets_by_pedal(perf: Performance) -> np.ndarray:
     """Return a copy of notes whose offsets are extended to the end of the sustain pedal.
 
